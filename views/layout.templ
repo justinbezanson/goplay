@@ -1,0 +1,18 @@
+package views
+
+templ Layout(children templ.Component) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>My App</title>
+		</head>
+		<body>
+			<nav>
+				<a href="/">Home</a>
+			</nav>
+			<main>
+				@children
+			</main>
+		</body>
+	</html>
+}
