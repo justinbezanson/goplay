@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS invitations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    org_id INTEGER NOT NULL REFERENCES organizations(id),
+    email TEXT NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT 0,
+    created_by INTEGER NOT NULL REFERENCES users(id),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

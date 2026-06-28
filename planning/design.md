@@ -41,7 +41,10 @@ Turn the existing Go/Gin/Templ sample into a reusable boilerplate for new web ap
 
 ```
 goplay/
-├── main.go                 # Entry point, router setup
+├── main.go                 # Entry point — initializes server, registers routes
+├── routes/
+│   ├── web.go              # Web page routes (/, etc.)
+│   └── api.go              # API routes
 ├── .env.example            # Env var template
 ├── .gitignore
 ├── Makefile
@@ -54,7 +57,11 @@ goplay/
 │   ├── 000001_create_organizations.up.sql
 │   ├── 000001_create_organizations.down.sql
 │   ├── 000002_create_users.up.sql
-│   └── 000002_create_users.down.sql
+│   ├── 000002_create_users.down.sql
+│   ├── 000003_create_invitations.up.sql
+│   ├── 000003_create_invitations.down.sql
+│   ├── 000004_create_sessions.up.sql
+│   └── 000004_create_sessions.down.sql
 ├── handlers/
 │   ├── auth.go             # Register, login, logout, password reset
 │   ├── home.go             # Home page
@@ -65,7 +72,9 @@ goplay/
 ├── models/
 │   ├── db.go               # DB init, migration runner
 │   ├── org.go              # Organization struct + queries
-│   └── user.go             # User struct + queries
+│   ├── user.go             # User struct + queries
+│   ├── invitation.go       # Invitation struct + queries
+│   └── session.go          # Session struct + queries
 ├── views/
 │   ├── layout.templ        # Base layout
 │   ├── home.templ          # Home/welcome page
@@ -134,6 +143,44 @@ goplay/
 - **Direct create**: primary user fills name + email + temporary password → user is created immediately (no invite email needed).
 - **Password reset**: self-service via email (all users), plus primary user can manually reset any member's password.
 - Sessions stored in SQLite. bcrypt for password hashing. MailHog for dev email.
+
+### User Stories — Authentication
+
+#### Registration & Onboarding
+
+1. **As a** visitor, **I want** to register an account with my organization details **so that** I can create an organization and become its primary user.
+2. **As a** visitor, **I want** to be automatically logged in after registering **so that** I can start using the app immediately.
+3. **As a** visitor, **I want** to receive a confirmation that my organization was created successfully **so that** I know registration is complete.
+
+#### Login & Session Management
+
+4. **As a** registered user (primary or regular), **I want** to log in with my email and password **so that** I can access the application.
+5. **As a** user, **I want** my session to persist across page loads via encrypted cookies **so that** I don't have to log in again on every request.
+6. **As a** user, **I want** to log out **so that** my session is terminated and the device is no longer authenticated.
+
+#### Invite Flow
+
+7. **As a** primary user, **I want** to invite new members by entering their email address **so that** they receive an invitation to join my organization.
+8. **As a** primary user, **I want** the system to generate a unique invitation token **so that** each invite link is secure and one-time use.
+9. **As a** invited user, **I want** to click the invite link and set up my account **so that** I can join the organization as a regular user.
+10. **As a** primary user, **I want** to see a list of pending invitations **so that** I can track who has and hasn't accepted.
+
+#### Direct User Creation
+
+11. **As a** primary user, **I want** to directly create a user by providing their name, email, and a temporary password **so that** they can start using the app immediately without an invite email.
+12. **As a** directly-created user, **I want** to log in with the temporary password **so that** I can access the application for the first time.
+
+#### Password Management
+
+13. **As a** user (any role), **I want** to request a password reset email **so that** I can regain access if I forget my password.
+14. **As a** user, **I want** to click a password reset link and set a new password **so that** I can securely update my credentials.
+15. **As a** primary user, **I want** to manually reset any member's password **so that** I can help users who are locked out.
+
+#### Role-Based Access Control
+
+16. **As a** primary user, **I want** to access organization settings and manage members **so that** I can configure my organization.
+17. **As a** regular user, **I want** to be prevented from managing org settings or other users **so that** only authorized personnel can make changes.
+18. **As a** user (any role), **I want** unauthenticated requests to redirect to the login page **so that** the app remains secure.
 
 ### Database & Migrations
 - SQLite file stored at `data/app.db` (gitignored)
